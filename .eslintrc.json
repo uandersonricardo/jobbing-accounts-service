@@ -1,0 +1,30 @@
+{
+    "env": {
+      "commonjs": true,
+      "es2020": true,
+      "node": true
+    },
+    "extends": [
+      "prettier",
+      "airbnb-base"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 12
+    },
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": "error",
+      "space-before-function-paren": "off",
+      "comma-dangle": "off",
+      "no-underscore-dangle": "off",
+      "no-console": "off",
+      "arrow-parens": "off",
+      "import/no-dynamic-require": "off",
+      "global-require": "off",
+      "object-curly-newline": "off",
+      "implicit-arrow-linebreak": "off",
+      "consistent-return": "off"
+    }
+  }
