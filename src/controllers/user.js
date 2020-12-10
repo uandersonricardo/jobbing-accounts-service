@@ -1,5 +1,24 @@
 const User = require('../models/user');
 
+const list = async (req, res) => {
+  try {
+    const users = [
+      {
+        id: '5dsjdoqwd',
+        name: 'Uanderson'
+      },
+      {
+        id: '823103210',
+        name: 'Carlos'
+      }
+    ];
+
+    return res.json(users);
+  } catch (err) {
+    return res.status(400).send({ error: 'Error loading users' });
+  }
+};
+
 const show = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -48,6 +67,7 @@ const search = async (req, res) => {
 };
 
 const user = {
+  list,
   show,
   update,
   search

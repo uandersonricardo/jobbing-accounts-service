@@ -7,6 +7,7 @@ const user = app => {
   const router = express.Router();
   router.use(authMiddleware.verifyToken);
 
+  router.get('/list', userController.list);
   router.get('/search', userController.search);
   router.get('/:userId', userController.show);
   router.put('/:userId', userController.update);

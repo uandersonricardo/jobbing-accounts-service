@@ -74,7 +74,7 @@ const forgotPassword = async (req, res) => {
     mailer.sendMail(
       {
         to: email,
-        from: 'naoresponda@oton.io',
+        from: 'naoresponda@jobbing.com',
         template: 'auth/forgot_password',
         context: { token, url: process.env.WEBSITE_URL }
       },

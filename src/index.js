@@ -17,5 +17,5 @@ require('./routes/index')(app);
 const PORT = process.env.PORT || 4001;
 
 app.listen(PORT, () => {
-  console.log(`Socket is running on port ${PORT}.`);
+  console.log(`User service is running on port ${PORT}.`);
 });
