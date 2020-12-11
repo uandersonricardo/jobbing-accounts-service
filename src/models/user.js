@@ -27,15 +27,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  bio: {
-    type: String,
-    required: false
-  },
   birthday: {
     type: Date,
     required: true
   },
-  role: {
+  educationLevel: {
     type: String,
     required: true
   },

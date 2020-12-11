@@ -10,12 +10,6 @@ const verifyToken = (req, res, next) => {
     return res.status(401).send({ error: 'No token provided' });
   }
 
-  if (authHeader !== 'temp') {
-    return res.status(401).send({ error: 'Token error' });
-  }
-
-  return next();
-
   const parts = authHeader.split(' ');
 
   if (!parts.length === 2) {

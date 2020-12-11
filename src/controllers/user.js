@@ -2,16 +2,7 @@ const User = require('../models/user');
 
 const list = async (req, res) => {
   try {
-    const users = [
-      {
-        id: '5dsjdoqwd',
-        name: 'Uanderson'
-      },
-      {
-        id: '823103210',
-        name: 'Carlos'
-      }
-    ];
+    const users = await User.find();
 
     return res.json(users);
   } catch (err) {
@@ -23,7 +14,7 @@ const show = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
 
-    return res.send({ user });
+    return res.json(user);
   } catch (err) {
     return res.status(400).send({ error: 'Error loading user' });
   }
@@ -50,7 +41,7 @@ const update = async (req, res) => {
 
     user.password = undefined;
 
-    return res.send({ user });
+    return res.json(user);
   } catch (err) {
     return res.status(400).send({ error: 'Error updating user' });
   }
@@ -60,7 +51,7 @@ const search = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.query.email });
 
-    return res.send({ user });
+    return res.json(user);
   } catch (err) {
     return res.status(400).send({ error: 'Error searching user' });
   }

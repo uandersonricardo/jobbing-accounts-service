@@ -23,8 +23,9 @@ const register = async (req, res) => {
 
     const token = generateToken({ id: user.id });
 
-    return res.send({ user, token });
+    return res.json(token);
   } catch (err) {
+    console.log(err);
     return res.status(400).send({ error: 'Registration failed' });
   }
 };
@@ -46,7 +47,17 @@ const login = async (req, res) => {
 
   const token = generateToken({ id: user.id });
 
-  res.send({ user, token });
+  return res.json(token);
+};
+
+const validate = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    return res.json(user);
+  } catch (err) {
+    return res.status(400).send({ error: 'Error validating token' });
+  }
 };
 
 const forgotPassword = async (req, res) => {
@@ -129,7 +140,8 @@ const auth = {
   register,
   login,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  validate
 };
 
 module.exports = auth;
