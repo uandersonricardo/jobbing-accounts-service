@@ -4,7 +4,9 @@ const crypto = require('crypto');
 
 const mailer = require('../modules/mailer');
 const authConfig = require('../config/auth');
-const User = require('../models/user');
+const Account = require('../models/account');
+const Applicant = require('../models/applicant');
+const Company = require('../models/company');
 
 const generateToken = (params = {}) =>
   jwt.sign(params, authConfig.secret, { expiresIn: 86400 });
@@ -13,15 +15,43 @@ const register = async (req, res) => {
   const { email } = req.body;
 
   try {
-    if (await User.findOne({ email })) {
-      return res.status(400).send({ error: 'User already exists' });
+    if (await Account.findOne({ email })) {
+      return res.status(400).send({ error: 'Account already exists' });
     }
 
-    const user = await User.create(req.body);
+    const {
+      applicant: applicantBody,
+      company: companyBody,
+      ...accountBody
+    } = req.body;
 
-    user.password = undefined;
+    const account = new Account(accountBody);
 
-    const token = generateToken({ id: user.id });
+    if (applicantBody) {
+      const applicant = new Applicant({
+        ...applicantBody,
+        account: account._id
+      });
+
+      await applicant.save();
+
+      account._applicant = applicant;
+    } else if (companyBody) {
+      const company = new Company({
+        ...companyBody,
+        account: account._id
+      });
+
+      company.save();
+
+      account._company = company;
+    }
+
+    await account.save();
+
+    account.password = undefined;
+
+    const token = generateToken({ id: account.id });
 
     return res.json(token);
   } catch (err) {
@@ -33,28 +63,31 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select('+password');
+  const account = await Account.findOne({ email }).select('+password');
 
-  if (!user) {
-    return res.status(400).send({ error: 'User not found' });
+  if (!account) {
+    return res.status(400).send({ error: 'Account not found' });
   }
 
-  if (!(await bcrypt.compare(password, user.password))) {
+  if (!(await bcrypt.compare(password, account.password))) {
     return res.status(400).send({ error: 'Invalid password' });
   }
 
-  user.password = undefined;
+  account.password = undefined;
 
-  const token = generateToken({ id: user.id });
+  const token = generateToken({ id: account.id });
 
   return res.json(token);
 };
 
 const validate = async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
+    const account = await Account.findById(req.accountId).populate([
+      '_applicant',
+      '_company'
+    ]);
 
-    return res.json(user);
+    return res.json(account);
   } catch (err) {
     return res.status(400).send({ error: 'Error validating token' });
   }
@@ -64,10 +97,10 @@ const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const account = await Account.findOne({ email });
 
-    if (!user) {
-      return res.status(400).send({ error: 'User not found' });
+    if (!account) {
+      return res.status(400).send({ error: 'Account not found' });
     }
 
     const token = crypto.randomBytes(20).toString('hex');
@@ -75,7 +108,7 @@ const forgotPassword = async (req, res) => {
     const now = new Date();
     now.setHours(now.getHours() + 1);
 
-    await User.findByIdAndUpdate(user.id, {
+    await Account.findByIdAndUpdate(account.id, {
       $set: {
         passwordResetToken: token,
         passwordResetExpires: now
@@ -106,29 +139,29 @@ const resetPassword = async (req, res) => {
   const { email, token, password } = req.body;
 
   try {
-    const user = await User.findOne({ email }).select(
+    const account = await Account.findOne({ email }).select(
       '+passwordResetToken passwordResetExpires'
     );
 
-    if (!user) {
-      return res.status(400).send({ error: 'User not found' });
+    if (!account) {
+      return res.status(400).send({ error: 'Account not found' });
     }
 
-    if (token !== user.passwordResetToken) {
+    if (token !== account.passwordResetToken) {
       return res.status(400).send({ error: 'Token invalid' });
     }
 
     const now = new Date();
 
-    if (now > user.passwordResetExpires) {
+    if (now > account.passwordResetExpires) {
       return res
         .status(400)
         .send({ error: 'Token expired, generate a new one' });
     }
 
-    user.password = password;
+    account.password = password;
 
-    await user.save();
+    await account.save();
 
     res.send();
   } catch (err) {

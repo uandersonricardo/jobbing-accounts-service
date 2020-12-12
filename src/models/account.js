@@ -3,7 +3,11 @@ const bcrypt = require('bcryptjs');
 
 const mongoose = require('../config/db');
 
-const UserSchema = new mongoose.Schema({
+const AccountSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
   email: {
     type: String,
     unique: true,
@@ -23,21 +27,33 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     select: false
   },
-  name: {
-    type: String,
-    required: true
-  },
-  birthday: {
-    type: Date,
-    required: true
-  },
-  educationLevel: {
-    type: String,
-    required: true
-  },
   photo: {
     type: String,
     required: false
+  },
+  bio: {
+    type: String,
+    required: true
+  },
+  city: {
+    type: String,
+    required: true
+  },
+  state: {
+    type: String,
+    required: true
+  },
+  country: {
+    type: String,
+    required: true
+  },
+  _applicant: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Applicant'
+  },
+  _company: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company'
   },
   createdAt: {
     type: Date,
@@ -45,13 +61,13 @@ const UserSchema = new mongoose.Schema({
   }
 });
 
-UserSchema.pre('save', async function (next) {
+AccountSchema.pre('save', async function (next) {
   const hash = await bcrypt.hash(this.password, 10);
   this.password = hash;
 
   next();
 });
 
-const User = mongoose.model('User', UserSchema);
+const Account = mongoose.model('Account', AccountSchema);
 
-module.exports = User;
+module.exports = Account;
