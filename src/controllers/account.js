@@ -74,7 +74,6 @@ const update = async (req, res) => {
 
     return res.json(account);
   } catch (err) {
-    console.log(err);
     return res.status(400).send({ error: 'Error updating account' });
   }
 };
