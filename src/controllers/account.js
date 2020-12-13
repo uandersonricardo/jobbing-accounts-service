@@ -40,7 +40,7 @@ const update = async (req, res) => {
       ...accountBody
     } = req.body;
 
-    const account = await Account.findOneAndUpdate(
+    const account = await Account.findByIdAndUpdate(
       req.params.accountId,
       accountBody,
       { new: true }
@@ -78,24 +78,10 @@ const update = async (req, res) => {
   }
 };
 
-const search = async (req, res) => {
-  try {
-    const account = await Account.findOne({ email: req.query.email }).populate([
-      '_applicant',
-      '_company'
-    ]);
-
-    return res.json(account);
-  } catch (err) {
-    return res.status(400).send({ error: 'Error searching account' });
-  }
-};
-
 const account = {
   list,
   show,
-  update,
-  search
+  update
 };
 
 module.exports = account;

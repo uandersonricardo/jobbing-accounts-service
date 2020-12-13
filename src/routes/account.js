@@ -8,7 +8,6 @@ const user = app => {
   router.use(authMiddleware.verifyToken);
 
   router.get('/', accountController.list);
-  router.get('/search', accountController.search);
   router.get('/:accountId', accountController.show);
   router.put('/:accountId', accountController.update);
 
